@@ -62,15 +62,21 @@ export const ChatInterface = () => {
 
     try {
       setLoading(true);
+      // Ensure model is loaded before generating
       await chrome.runtime.sendMessage({ action: 'LOAD_MODEL', modelId: selectedModelId });
-      setLoading(false);
 
       let context = "";
       if (currentSession.messages.length === 0) {
           const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
           if (tab.id) {
-              const pageData = await chrome.tabs.sendMessage(tab.id, { action: 'GET_PAGE_CONTENT' });
-              context = `Context from ${pageData.title} (${pageData.url}):\n\n${pageData.content}\n\n---\n\n`;
+              try {
+                const pageData = await chrome.tabs.sendMessage(tab.id, { action: 'GET_PAGE_CONTENT' });
+                if (pageData) {
+                    context = `Context from ${pageData.title} (${pageData.url}):\n\n${pageData.content}\n\n---\n\n`;
+                }
+              } catch (e) {
+                console.log("Could not get page content", e);
+              }
           }
       }
 
@@ -95,23 +101,23 @@ export const ChatInterface = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-background text-foreground">
+    <div className="flex flex-col h-full bg-background text-foreground overflow-hidden">
       <div className="flex items-center justify-between p-4 border-b">
         <h1 className="font-semibold text-lg flex items-center gap-2">
             <Sparkles className="text-primary" size={20} />
             Claritive
         </h1>
         <div className="flex gap-2">
-            <button onClick={() => setShowPrompts(!showPrompts)} className="p-2 hover:bg-accent rounded-md"><Sparkles size={20} /></button>
-            <button className="p-2 hover:bg-accent rounded-md"><Settings size={20} /></button>
+            <button onClick={() => setShowPrompts(!showPrompts)} className="p-2 hover:bg-accent rounded-md transition-colors"><Sparkles size={20} /></button>
+            <button className="p-2 hover:bg-accent rounded-md transition-colors"><Settings size={20} /></button>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
         {currentSession?.messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[90%] p-3 rounded-2xl ${
-              m.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted shadow-sm'
+              m.role === 'user' ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted shadow-sm border border-border/50'
             }`}>
               <MarkdownRenderer content={m.content} />
             </div>
@@ -119,36 +125,37 @@ export const ChatInterface = () => {
         ))}
         {streamingMessage && (
           <div className="flex justify-start">
-            <div className="max-w-[90%] p-3 rounded-2xl bg-muted shadow-sm">
+            <div className="max-w-[90%] p-3 rounded-2xl bg-muted shadow-sm border border-border/50">
               <MarkdownRenderer content={streamingMessage} />
             </div>
           </div>
         )}
         {isModelLoading && (
-            <div className="flex justify-center p-2 text-sm text-muted-foreground animate-pulse">
+            <div className="flex justify-center p-4 text-sm text-muted-foreground bg-accent/20 rounded-xl animate-pulse">
                 <Loader2 className="animate-spin mr-2" size={16} />
-                Initializing model... {loadProgress.toFixed(0)}%
+                Initializing AI Engine... {loadProgress.toFixed(0)}%
             </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
       {showPrompts && (
-          <div className="p-4 grid grid-cols-2 gap-2 bg-accent/30 border-t">
+          <div className="p-4 grid grid-cols-2 gap-2 bg-accent/10 border-t backdrop-blur-sm">
               {PROMPT_LIBRARY.map(p => (
                   <button
                     key={p.id}
                     onClick={() => handleSend(p.prompt)}
-                    className="p-2 text-xs text-left hover:bg-background rounded-lg border bg-background/50 transition-colors"
+                    className="p-3 text-xs text-left hover:bg-background rounded-xl border border-border/50 bg-background/50 transition-all hover:shadow-sm active:scale-95"
                   >
-                      <div className="font-medium">{p.name}</div>
+                      <div className="font-semibold text-primary/80 mb-1">{p.name}</div>
+                      <div className="text-[10px] text-muted-foreground line-clamp-1">{p.prompt}</div>
                   </button>
               ))}
           </div>
       )}
 
-      <div className="p-4 border-t bg-background">
-        <div className="relative">
+      <div className="p-4 border-t bg-background/80 backdrop-blur-md">
+        <div className="relative group">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -159,15 +166,15 @@ export const ChatInterface = () => {
                 }
             }}
             placeholder="Ask about this page..."
-            className="w-full p-4 pr-12 rounded-2xl bg-secondary/50 border-none focus:ring-2 focus:ring-primary resize-none placeholder:text-muted-foreground/60"
+            className="w-full p-4 pr-14 rounded-2xl bg-secondary/30 border border-transparent focus:border-primary/30 focus:bg-secondary/50 focus:ring-0 transition-all resize-none placeholder:text-muted-foreground/50"
             rows={2}
           />
           <button
             onClick={() => handleSend()}
             disabled={isModelLoading || !input.trim()}
-            className="absolute right-3 bottom-3 p-2 bg-primary text-primary-foreground rounded-xl disabled:opacity-50 shadow-lg hover:scale-105 active:scale-95 transition-all"
+            className="absolute right-3 bottom-3 p-2.5 bg-primary text-primary-foreground rounded-xl disabled:opacity-30 shadow-lg hover:shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
           >
-            <Send size={18} />
+            <Send size={20} />
           </button>
         </div>
       </div>
