@@ -25,11 +25,18 @@ Claritive is a privacy-first Chrome extension that runs AI models locally in you
 6. Click **Load unpacked** and select the `dist` folder.
 
 ## First Run & Model Loading
-The first time you ask a question, Claritive will download the selected AI model (e.g., Llama 3).
+The first time you ask a question, Claritive will download the selected AI model.
 - **Model Sizes**: Models are typically between **1.5GB and 5GB**.
 - **Download**: Depending on your internet speed, this may take a few minutes.
 - **Progress**: You will see a progress bar in the chat interface during initialization.
 - **Cache**: Models are cached locally in your browser's indexedDB/Cache API after the first download.
+
+## Manual Model Management
+While the extension handles downloads automatically, you can find the source models here:
+- **WebLLM Models**: [mlc-ai on Hugging Face](https://huggingface.co/mlc-ai)
+- **Transformers.js Models**: [Xenova on Hugging Face](https://huggingface.co/Xenova)
+
+**Note on Manual Download:** You cannot simply download these files into a folder on your computer to use them with the extension. WebLLM and Transformers.js are designed to fetch and manage their own weights within the browser's persistent storage for security and performance reasons. Once the download is complete in the extension, it will work offline.
 
 ## Troubleshooting
 - **"Error: No model loaded"**: This usually happens if the AI engine failed to initialize. Ensure you have a stable connection for the first download and that your browser supports WebGPU/WebGL.
