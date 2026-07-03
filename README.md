@@ -8,6 +8,10 @@ Claritive is a privacy-first Chrome extension that runs AI models locally in you
 - **Context Extraction**: Automatically extracts content from the active tab.
 - **Prompt Library**: Pre-built prompts for summarization, analysis, and more.
 
+## Prerequisites
+- **Node.js**: Version 20.x or later is recommended.
+- **pnpm**: Version 9.x or later.
+
 ## Installation (Development Mode)
 1. Clone this repository.
 2. Install dependencies: `pnpm install`.
@@ -22,7 +26,7 @@ Claritive is a privacy-first Chrome extension that runs AI models locally in you
 - Select text on any page, right-click, and choose "Ask Claritive".
 
 ## Tech Stack
-- React, TypeScript, Vite
+- React 19, TypeScript, Vite 6
 - Tailwind CSS
 - WebLLM, Transformers.js
 - CRXJS Vite Plugin
