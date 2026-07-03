@@ -26,7 +26,8 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["src/content/index.ts"]
+      "js": ["src/content/index.ts"],
+      "run_at": "document_idle"
     }
   ],
   "commands": {
@@ -41,5 +42,8 @@
     "16": "public/favicon.svg",
     "48": "public/favicon.svg",
     "128": "public/favicon.svg"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
   }
 }

@@ -1,5 +1,8 @@
 import { modelManager } from "./model-manager";
 
+// Simplified for testing registration
+console.log('Claritive Background Service Worker Initialized');
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "ask-claritive",
@@ -11,12 +14,12 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "ask-claritive" && tab?.id) {
     chrome.sidePanel.open({ tabId: tab.id });
-    // We can send a message to the sidepanel once it's open,
-    // or the sidepanel can check the selection on mount.
     setTimeout(() => {
         chrome.runtime.sendMessage({
             action: "ASK_QUESTION",
             text: info.selectionText
+        }).catch(() => {
+            // Might fail if sidepanel is not yet fully loaded/listening
         });
     }, 500);
   }
@@ -38,7 +41,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       chrome.runtime.sendMessage({
         action: "MODEL_LOAD_PROGRESS",
         progress
-      });
+      }).catch(() => {});
     })
     .then(() => sendResponse({ success: true }))
     .catch((error) => sendResponse({ success: false, error: error.message }));
@@ -57,7 +60,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         chrome.runtime.sendMessage({
           action: "GENERATION_CHUNK",
           chunk
-        });
+        }).catch(() => {});
       }
     })
     .then((fullText) => sendResponse({ success: true, fullText }))

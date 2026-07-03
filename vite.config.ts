@@ -15,10 +15,15 @@ export default defineConfig({
     },
   },
   build: {
+    target: 'esnext',
+    modulePreload: false,
     rollupOptions: {
       input: {
         sidepanel: 'sidepanel.html',
       },
     },
   },
+  optimizeDeps: {
+    include: ['@mlc-ai/web-llm', '@xenova/transformers']
+  }
 })

@@ -1,6 +1,4 @@
 import type { AIModel, ModelConfig, ModelType } from "../ai/types";
-import { WebLLMEngine } from "../ai/web-llm";
-import { TransformersEngine } from "../ai/transformers";
 
 export const AVAILABLE_MODELS: ModelConfig[] = [
   {
@@ -22,9 +20,19 @@ class ModelManager {
   private activeEngine: AIModel | null = null;
   private activeModelConfig: ModelConfig | null = null;
 
-  constructor() {
-    this.engines.set('web-llm', new WebLLMEngine());
-    this.engines.set('transformers', new TransformersEngine());
+  private async getOrInitEngine(type: ModelType): Promise<AIModel> {
+    let engine = this.engines.get(type);
+    if (!engine) {
+      if (type === 'web-llm') {
+        const { WebLLMEngine } = await import("../ai/web-llm");
+        engine = new WebLLMEngine();
+      } else {
+        const { TransformersEngine } = await import("../ai/transformers");
+        engine = new TransformersEngine();
+      }
+      this.engines.set(type, engine);
+    }
+    return engine;
   }
 
   async loadModel(modelId: string, progressCallback?: (progress: number) => void) {
@@ -33,8 +41,7 @@ class ModelManager {
 
     if (this.activeModelConfig?.id === modelId) return;
 
-    const engine = this.engines.get(config.type);
-    if (!engine) throw new Error("Engine not found for type " + config.type);
+    const engine = await this.getOrInitEngine(config.type);
 
     if (this.activeEngine && this.activeEngine !== engine) {
         await this.activeEngine.unload();
