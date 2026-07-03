@@ -3,6 +3,7 @@
   "name": "Claritive",
   "version": "1.0.0",
   "description": "Privacy-first local AI assistant for your browser.",
+  "minimum_chrome_version": "114",
   "permissions": [
     "sidePanel",
     "activeTab",

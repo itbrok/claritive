@@ -8,6 +8,10 @@ Claritive is a privacy-first Chrome extension that runs AI models locally in you
 - **Context Extraction**: Automatically extracts content from the active tab.
 - **Prompt Library**: Pre-built prompts for summarization, analysis, and more.
 
+## Compatibility
+- **Chrome / Edge**: Version **114 or later** is required for the Side Panel API.
+- If you see `Permission 'sidePanel' is unknown`, please update your browser.
+
 ## Prerequisites
 - **Node.js**: Version 20.x or later is recommended.
 - **pnpm**: Version 9.x or later.
