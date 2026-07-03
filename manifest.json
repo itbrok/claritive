@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Claritive",
+  "version": "1.0.0",
+  "description": "Privacy-first local AI assistant for your browser.",
+  "permissions": [
+    "sidePanel",
+    "activeTab",
+    "scripting",
+    "storage",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "index.html"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/index.ts"]
+    }
+  ],
+  "commands": {
+    "open-claritive": {
+      "suggested_key": {
+        "default": "Alt+C"
+      },
+      "description": "Open Claritive Side Panel"
+    }
+  },
+  "icons": {
+    "16": "public/favicon.svg",
+    "48": "public/favicon.svg",
+    "128": "public/favicon.svg"
+  }
+}
